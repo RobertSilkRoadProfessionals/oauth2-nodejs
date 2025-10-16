@@ -28,7 +28,7 @@ app.use('/connected', require('./routes/connected.js'))
 
 // Call an example API over OAuth2
 app.use('/api_call', require('./routes/api_call.js'))
-
+app.use('/purchase_api_call', require('./routes/purchase_api_call.js'))
 
 // Start server on HTTP (will use ngrok for HTTPS forwarding)
 app.listen(3000, function () {

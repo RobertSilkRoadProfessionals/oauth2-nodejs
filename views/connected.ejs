@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
   <title>OAuth2 Sample App - Intuit</title>
@@ -12,6 +13,12 @@
     function apiCall() {
       $("#result").html('Loading...')
       $.get("/api_call", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
+    function purchaseApiCall() {
+      $("#result").html('Loading...')
+      $.get("/purchase_api_call", function(data) {
         $("#result").html(JSON.stringify(data, null, 2))
       })
     }
@@ -33,9 +40,19 @@
   <a href="/">Home</a>
   <h3>Connected!</h3>
   <p>Welcome<% if (locals.givenName) { %>, <%= locals.givenName %><% } %>!</p>
-  <p>Would you like to make a sample API call?</p>
+  
+  <% if (locals.hasRealmId) { %>
+    <p style="color: green;">✓ QuickBooks company access granted (Realm ID: <%= locals.realmId %>)</p>
+    <p>You can now make API calls to QuickBooks!</p>
+  <% } else { %>
+    <p style="color: orange;">⚠ No QuickBooks company access</p>
+    <p>This typically means you used "Sign In With Intuit" instead of "Connect To QuickBooks".</p>
+    <p>To access QuickBooks data, please <a href="/">go back</a> and use the "Connect To QuickBooks" button.</p>
+  <% } %>
+  
   <div>
     <button onclick="apiCall()">QuickBooks API Call</button>
+    <button onclick="purchaseApiCall()">QuickBooks Purchase API Call</button>
     <button onclick="refreshCall()">Refresh Token Call</button>
     <button onclick="revokeCall()">Revoke Token Call</button>
     <br><br>

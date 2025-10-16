@@ -14,7 +14,9 @@ router.get('/', function (req, res) {
   })
 
   // Redirect
-  console.log('Redirecting to authorization uri: ' + uri)
+  console.log('Redirecting to QuickBooks authorization uri: ' + uri)
+  console.log('This should redirect to Intuit and then return with realmId parameter')
+  console.log('Scopes being used:', tools.intuitAuth.options.scopes)
   res.redirect(uri)
 })
 
