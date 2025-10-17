@@ -68,7 +68,7 @@ router.get('/items', function (req, res) {
   })
 
   // Query for items
-  var url = config.api_uri + req.session.realmId + "/query?query=SELECT * FROM Item WHERE Type='Service' OR Type='Inventory' OR Type='NonInventory'"
+  var url = config.api_uri + req.session.realmId + "/query?query=SELECT * FROM Item" // WHERE Type='Service' OR Type='Inventory' OR Type='NonInventory'"
   console.log('Querying items: ' + url)
   
   var requestObj = {
@@ -93,6 +93,7 @@ router.get('/items', function (req, res) {
         // Format for easier reading
         var itemList = items.map(item => ({
           id: item.Id,
+          sku: item.Sku,
           name: item.Name,
           type: item.Type,
           qtyOnHand: item.QtyOnHand,

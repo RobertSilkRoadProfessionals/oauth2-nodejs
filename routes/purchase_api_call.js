@@ -16,7 +16,7 @@ router.get('/', function (req, res) {
   var url = config.api_uri + req.session.realmId + '/purchase';
   console.log('Making POST API call to: ' + url);
 
-  // Updated purchase object using AccountBasedExpenseLineDetail for better compatibility
+
   var jsonBody = {
     'AccountRef': {
       'value': '41',
@@ -62,17 +62,35 @@ router.get('/', function (req, res) {
     // ],
     'Line': [
       {
-        'Amount': 104.00,
+        //'LineNum': 1, // maybe use to ensure that the lines stay in order
+        'Amount': 104.05,
+
         'DetailType': 'ItemBasedExpenseLineDetail',
-        'Description': 'ItemBasedExpenseLineDetail PO:12345 - office supplies',
+        'Description': 'ItemBasedExpenseLineDetail - Cleaning Service for Airbnb',
         'ItemBasedExpenseLineDetail': {
-          'ItemRef': {
+          'Qty': 15,
+          "BillableStatus": "NotBillable",
+          "UnitPrice": 0.75,
+          'ItemRef': { // must be an item set up for purchase
+            // 'value': '11',
+            // 'name': 'Pump'
+            'value': '19',
+            'name': '	Steam cleaning of residence'
+          },
+          'TaxCodeRef': {
+            'value': '2',
+            'name': 'TAX'
+          },
+          'CustomerRef': {
             'value': '1',
-            'name': 'Office Supplies'
+            //'name': 'John Doe'
           }
         }
       }
     ]
+
+
+
     // 'Line': [ // use if Preferences.ProductAndServicesPrefs.ForPurchase is set to true
     //   {
     //     //'LineNum': 1, // maybe use to ensure that the lines stay in order
@@ -130,34 +148,34 @@ router.get('/', function (req, res) {
       console.log('Request error:', err);
       return res.json({ error: 'Request failed', details: err });
     }
-    
+
     console.log('Response status:', response.statusCode);
     console.log('Response body:', response.body);
-    
+
     // Check if 401 response was returned - refresh tokens if so!
     tools.checkForUnauthorized(req, requestObj, err, response).then(function ({ err, response }) {
       if (err) {
         console.log('Authorization error:', err);
         return res.json({ error: 'Authorization error', details: err });
       }
-      
+
       if (response.statusCode != 200) {
         console.log('API Error - Status:', response.statusCode);
         console.log('API Error - Body:', response.body);
-        
+
         // Try to parse the error response for better debugging
         try {
           var errorBody = JSON.parse(response.body);
-          return res.json({ 
-            error: 'QuickBooks API Error', 
+          return res.json({
+            error: 'QuickBooks API Error',
             statusCode: response.statusCode,
-            qbError: errorBody 
+            qbError: errorBody
           });
         } catch (parseError) {
-          return res.json({ 
-            error: 'API Error', 
-            statusCode: response.statusCode, 
-            body: response.body 
+          return res.json({
+            error: 'API Error',
+            statusCode: response.statusCode,
+            body: response.body
           });
         }
       }
@@ -171,52 +189,5 @@ router.get('/', function (req, res) {
     });
   });
 })
-
-// /** /api_call/revoke **/
-// router.get('/revoke', function (req, res) {
-//   var token = tools.getToken(req.session)
-//   if(!token) return res.json({error: 'Not authorized'})
-
-//   var url = tools.revoke_uri
-//   request({
-//     url: url,
-//     method: 'POST',
-//     headers: {
-//       'Authorization': 'Basic ' + tools.basicAuth,
-//       'Accept': 'application/json',
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify({
-//       'token': token.accessToken
-//     })
-//   }, function (err, response, body) {
-//     if(err || response.statusCode != 200) {
-//       return res.json({error: err, statusCode: response.statusCode})
-//     }
-//     tools.clearToken(req.session)
-//     res.json({response: "Revoke successful"})
-//   })
-// })
-
-// /** /api_call/refresh **/
-// // Note: typical use case would be to refresh the tokens internally (not an API call)
-// // We recommend refreshing upon receiving a 401 Unauthorized response from Intuit.
-// // A working example of this can be seen above: `/api_call`
-// router.get('/refresh', function (req, res) {
-//   var token = tools.getToken(req.session)
-//   if(!token) return res.json({error: 'Not authorized'})
-
-//   tools.refreshTokens(req.session).then(function(newToken) {
-//     // We have new tokens!
-//     res.json({
-//       accessToken: newToken.accessToken,
-//       refreshToken: newToken.refreshToken
-//     })
-//   }, function(err) {
-//     // Did we try to call refresh on an old token?
-//     console.log(err)
-//     res.json(err)
-//   })
-// })
 
 module.exports = router
