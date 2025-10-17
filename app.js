@@ -28,6 +28,15 @@ app.use('/connected', require('./routes/connected.js'))
 
 // Call an example API over OAuth2
 app.use('/api_call', require('./routes/api_call.js'))
+
+// Purchase API call
+app.use('/purchase_api_call', require('./routes/purchase_api_call.js'))
+
+// Simple purchase API call
+app.use('/simple_purchase', require('./routes/simple_purchase.js'))
+
+// Accounts lookup for debugging
+app.use('/accounts', require('./routes/accounts.js'))
 app.use('/purchase_api_call', require('./routes/purchase_api_call.js'))
 
 // Start server on HTTP (will use ngrok for HTTPS forwarding)

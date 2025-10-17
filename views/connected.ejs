@@ -34,6 +34,30 @@
         $("#result").html(JSON.stringify(data, null, 2))
       })
     }
+    function purchaseApiCall() {
+      $("#result").html('Loading...')
+      $.get("/purchase_api_call", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
+    function simplePurchaseCall() {
+      $("#result").html('Loading...')
+      $.get("/simple_purchase", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
+    function accountsCall() {
+      $("#result").html('Loading...')
+      $.get("/accounts", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
+    function itemsCall() {
+      $("#result").html('Loading...')
+      $.get("/accounts/items", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
   </script>
 </head>
 <body>
@@ -51,10 +75,18 @@
   <% } %>
   
   <div>
-    <button onclick="apiCall()">QuickBooks API Call</button>
-    <button onclick="purchaseApiCall()">QuickBooks Purchase API Call</button>
-    <button onclick="refreshCall()">Refresh Token Call</button>
-    <button onclick="revokeCall()">Revoke Token Call</button>
+    <h4>API Calls:</h4>
+    <button onclick="apiCall()">QuickBooks Company Info</button>
+    <button onclick="purchaseApiCall()">Create Purchase</button>
+    <button onclick="simplePurchaseCall()">Simple Purchase</button>
+    <br><br>
+    <h4>Debugging:</h4>
+    <button onclick="accountsCall()">List Accounts</button>
+    <button onclick="itemsCall()">List Items</button>
+    <br><br>
+    <h4>Token Management:</h4>
+    <button onclick="refreshCall()">Refresh Token</button>
+    <button onclick="revokeCall()">Revoke Token</button>
     <br><br>
     <div><code id="result"></code></div>
 </body>
