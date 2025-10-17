@@ -22,7 +22,13 @@ router.get('/', function (req, res) {
       'value': '41',
       'name': 'Mastercard'
     },
+    "EntityRef": {
+      "value": "45",
+      "name": "Office Depot",
+      "type": "Vendor"
+    },
     'PaymentType': 'CreditCard',
+    "DocNumber": "EXP-2025-1016",
     'TxnDate': '2025-10-17', // Updated to current date
     'TxnSource': 'Node.js OAuth2 Sample',
     'PrivateNote': 'Purchase transaction created via API - Office supplies',
@@ -84,7 +90,11 @@ router.get('/', function (req, res) {
           'CustomerRef': {
             'value': '1',
             //'name': 'John Doe'
-          }
+          },
+          // "ClassRef": { // Commented out until valid Class ID is found
+          //   "value": "200", // This ID doesn't exist - use /accounts/classes to find valid IDs
+          //   "name": "Admin Department"
+          // }
         }
       }
     ]

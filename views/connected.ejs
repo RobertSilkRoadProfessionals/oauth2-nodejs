@@ -58,6 +58,12 @@
         $("#result").html(JSON.stringify(data, null, 2))
       })
     }
+    function classesCall() {
+      $("#result").html('Loading...')
+      $.get("/accounts/classes", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
   </script>
 </head>
 <body>
@@ -83,6 +89,7 @@
     <h4>Debugging:</h4>
     <button onclick="accountsCall()">List Accounts</button>
     <button onclick="itemsCall()">List Items</button>
+    <button onclick="classesCall()">List Classes</button>
     <br><br>
     <h4>Token Management:</h4>
     <button onclick="refreshCall()">Refresh Token</button>
