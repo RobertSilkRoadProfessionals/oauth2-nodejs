@@ -7,6 +7,7 @@ var app = express()
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.json()) // Add JSON body parser for POST requests
 app.use(session({secret: 'secret', resave: 'false', saveUninitialized: 'false'}))
 
 // Initial view - loads Connect To QuickBooks Button
@@ -37,6 +38,9 @@ app.use('/simple_purchase', require('./routes/simple_purchase.js'))
 
 // Accounts lookup for debugging
 app.use('/accounts', require('./routes/accounts.js'))
+
+// Class creation endpoint
+app.use('/create_class', require('./routes/create_class.js'))
 app.use('/purchase_api_call', require('./routes/purchase_api_call.js'))
 
 // Start server on HTTP (will use ngrok for HTTPS forwarding)

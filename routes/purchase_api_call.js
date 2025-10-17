@@ -12,9 +12,24 @@ router.get('/', function (req, res) {
     error: 'No realm ID.  QBO calls only work if the accounting scope was passed!'
   })
 
+  // Get class parameters from query string
+  var classId = req.query.classId
+  var className = req.query.className
+  
+  // Get payment method parameters from query string
+  var paymentMethodId = req.query.paymentMethodId
+  var paymentMethodName = req.query.paymentMethodName
+  var paymentType = req.query.paymentType || 'CreditCard' // Default to CreditCard
+
   // Set up API call (with OAuth2 accessToken)
   var url = config.api_uri + req.session.realmId + '/purchase';
   console.log('Making POST API call to: ' + url);
+  if (classId) {
+    console.log('Using class ID:', classId, 'with name:', className);
+  }
+  if (paymentMethodId) {
+    console.log('Using payment method ID:', paymentMethodId, 'with name:', paymentMethodName, 'type:', paymentType);
+  }
 
 
   var jsonBody = {
@@ -27,7 +42,7 @@ router.get('/', function (req, res) {
       "name": "Office Depot",
       "type": "Vendor"
     },
-    'PaymentType': 'CreditCard',
+    'PaymentType': 'CreditCard', // Hardcoded CreditCard is the only thing that seems to work?
     "DocNumber": "EXP-2025-1016",
     'TxnDate': '2025-10-17', // Updated to current date
     'TxnSource': 'Node.js OAuth2 Sample',
@@ -90,15 +105,29 @@ router.get('/', function (req, res) {
           'CustomerRef': {
             'value': '1',
             //'name': 'John Doe'
-          },
-          "ClassRef": { // Commented out until valid Class ID is found
-            "value": "200", // This ID doesn't exist - use /accounts/classes to find valid IDs
-            "name": "Admin Department"
           }
         }
       }
     ]
   };
+
+  // Add ClassRef to the line item if classId is provided
+  if (classId && className) {
+    jsonBody.Line[0].ItemBasedExpenseLineDetail.ClassRef = {
+      "value": classId,
+      "name": className
+    };
+    console.log('Added ClassRef to purchase:', classId, className);
+  }
+
+  // Add PaymentMethodRef if payment method is selected
+  if (paymentMethodId && paymentMethodName) {
+    jsonBody.PaymentMethodRef = {
+      "value": paymentMethodId,
+      "name": paymentMethodName
+    };
+    console.log('Added PaymentMethodRef to purchase:', paymentMethodId, paymentMethodName);
+  }
 
   var requestObj = {
     url: url,

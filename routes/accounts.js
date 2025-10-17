@@ -172,4 +172,59 @@ router.get('/classes', function (req, res) {
   })
 })
 
+/** /payment-methods - Get list of payment methods for debugging purchase API calls **/
+router.get('/payment-methods', function (req, res) {
+  var token = tools.getToken(req.session)
+  if (!token) return res.json({ error: 'Not authorized' })
+  if (!req.session.realmId) return res.json({
+    error: 'No realm ID. QBO calls only work if the accounting scope was passed!'
+  })
+
+  // Query for payment methods
+  var url = config.api_uri + req.session.realmId + "/query?query=SELECT * FROM PaymentMethod"
+  console.log('Querying payment methods: ' + url)
+  
+  var requestObj = {
+    url: url,
+    headers: {
+      'Authorization': 'Bearer ' + token.accessToken,
+      'Accept': 'application/json'
+    }
+  }
+
+  request(requestObj, function (err, response) {
+    tools.checkForUnauthorized(req, requestObj, err, response).then(function ({ err, response }) {
+      if (err || response.statusCode != 200) {
+        console.log('Error querying payment methods:', err, response.statusCode)
+        return res.json({ error: err, statusCode: response.statusCode, body: response.body })
+      }
+
+      try {
+        var data = JSON.parse(response.body)
+        var paymentMethods = data.QueryResponse.PaymentMethod || []
+        
+        // Format for easier reading
+        var paymentMethodList = paymentMethods.map(pm => ({
+          id: pm.Id,
+          name: pm.Name,
+          type: pm.Type,
+          active: pm.Active
+        }))
+        
+        res.json({
+          message: 'Available payment methods - use these in PaymentMethodRef',
+          totalPaymentMethods: paymentMethodList.length,
+          paymentMethods: paymentMethodList
+        })
+      } catch (parseError) {
+        console.log('Error parsing payment methods response:', parseError)
+        res.json({ error: 'Failed to parse response', body: response.body })
+      }
+    }, function (err) {
+      console.log('Authorization error:', err)
+      return res.json({ error: 'Authorization error', details: err })
+    })
+  })
+})
+
 module.exports = router

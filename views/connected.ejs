@@ -36,9 +36,75 @@
     }
     function purchaseApiCall() {
       $("#result").html('Loading...')
-      $.get("/purchase_api_call", function(data) {
-        $("#result").html(JSON.stringify(data, null, 2))
-      })
+      
+      var className = $("#classInput").val().trim();
+      var selectedPaymentMethod = $("#paymentMethodSelect option:selected");
+      var paymentMethodId = selectedPaymentMethod.val();
+      var paymentMethodName = selectedPaymentMethod.data('name');
+      var paymentType = selectedPaymentMethod.data('type');
+      
+      // Prepare parameters for the API call
+      var params = {};
+      if (className) {
+        params.className = className;
+      }
+      if (paymentMethodId) {
+        params.paymentMethodId = paymentMethodId;
+        params.paymentMethodName = paymentMethodName;
+        params.paymentType = paymentType;
+      }
+      
+      if (className) {
+        // First create the class, then create the purchase
+        $("#result").html('Creating class: ' + className + '...')
+        
+        $.ajax({
+          url: "/create_class",
+          method: "POST",
+          contentType: "application/json",
+          data: JSON.stringify({ className: className }),
+          success: function(classData) {
+            if (classData.error) {
+              $("#result").html('Error creating class: ' + JSON.stringify(classData, null, 2))
+              return;
+            }
+            
+            // Now create purchase with the class ID and payment method
+            $("#result").html('Class created successfully. Creating purchase...')
+            
+            params.classId = classData.classId;
+            params.className = classData.className;
+            
+            $.ajax({
+              url: "/purchase_api_call",
+              method: "GET",
+              data: params,
+              success: function(purchaseData) {
+                $("#result").html('Purchase with class created:\n' + JSON.stringify(purchaseData, null, 2))
+              },
+              error: function(xhr) {
+                $("#result").html('Error creating purchase: ' + xhr.responseText)
+              }
+            });
+          },
+          error: function(xhr) {
+            $("#result").html('Error creating class: ' + xhr.responseText)
+          }
+        });
+      } else {
+        // Create purchase without class but potentially with payment method
+        $.ajax({
+          url: "/purchase_api_call",
+          method: "GET",
+          data: params,
+          success: function(data) {
+            $("#result").html(JSON.stringify(data, null, 2))
+          },
+          error: function(xhr) {
+            $("#result").html('Error creating purchase: ' + xhr.responseText)
+          }
+        });
+      }
     }
     function simplePurchaseCall() {
       $("#result").html('Loading...')
@@ -64,6 +130,51 @@
         $("#result").html(JSON.stringify(data, null, 2))
       })
     }
+    function testCreateClass() {
+      var className = $("#classInput").val().trim();
+      if (!className) {
+        $("#result").html('Please enter a class name first');
+        return;
+      }
+      
+      $("#result").html('Creating class: ' + className + '...')
+      
+      $.ajax({
+        url: "/create_class",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ className: className }),
+        success: function(data) {
+          $("#result").html('Class creation result:\n' + JSON.stringify(data, null, 2))
+        },
+        error: function(xhr) {
+          $("#result").html('Error creating class: ' + xhr.responseText)
+        }
+      });
+    }
+    function paymentMethodsCall() {
+      $("#result").html('Loading...')
+      $.get("/accounts/payment-methods", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
+    function loadPaymentMethods() {
+      $.get("/accounts/payment-methods", function(data) {
+        if (data.paymentMethods) {
+          var dropdown = $("#paymentMethodSelect");
+          dropdown.empty();
+          dropdown.append('<option value="">Select Payment Method</option>');
+          
+          data.paymentMethods.forEach(function(method) {
+            dropdown.append('<option value="' + method.id + '" data-name="' + method.name + '" data-type="' + method.type + '">' + method.name + '</option>');
+          });
+        }
+      });
+    }
+    // Load payment methods when page loads
+    $(document).ready(function() {
+      loadPaymentMethods();
+    });
   </script>
 </head>
 <body>
@@ -83,13 +194,25 @@
   <div>
     <h4>API Calls:</h4>
     <button onclick="apiCall()">QuickBooks Company Info</button>
+    <br><br>
+    <label for="paymentMethodSelect">Payment Method: </label>
+    <select id="paymentMethodSelect" style="margin-right: 10px; min-width: 150px;">
+      <option value="">Loading...</option>
+    </select>
+    <br><br>
+    <label for="classInput">Class (optional): </label>
+    <input type="text" id="classInput" placeholder="Enter class name to create" style="margin-right: 10px;">
+    <br><br>
     <button onclick="purchaseApiCall()">Create Purchase</button>
+    <button onclick="testCreateClass()" style="margin-left: 5px;">Test Create Class Only</button>
+    <br><br>
     <button onclick="simplePurchaseCall()">Simple Purchase</button>
     <br><br>
     <h4>Debugging:</h4>
     <button onclick="accountsCall()">List Accounts</button>
     <button onclick="itemsCall()">List Items</button>
     <button onclick="classesCall()">List Classes</button>
+    <button onclick="paymentMethodsCall()">List Payment Methods</button>
     <br><br>
     <h4>Token Management:</h4>
     <button onclick="refreshCall()">Refresh Token</button>
