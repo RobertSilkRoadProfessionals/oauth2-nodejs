@@ -91,52 +91,13 @@ router.get('/', function (req, res) {
             'value': '1',
             //'name': 'John Doe'
           },
-          // "ClassRef": { // Commented out until valid Class ID is found
-          //   "value": "200", // This ID doesn't exist - use /accounts/classes to find valid IDs
-          //   "name": "Admin Department"
-          // }
+          "ClassRef": { // Commented out until valid Class ID is found
+            "value": "200", // This ID doesn't exist - use /accounts/classes to find valid IDs
+            "name": "Admin Department"
+          }
         }
       }
     ]
-
-
-
-    // 'Line': [ // use if Preferences.ProductAndServicesPrefs.ForPurchase is set to true
-    //   {
-    //     //'LineNum': 1, // maybe use to ensure that the lines stay in order
-    //     'Amount': 169.12,
-    //     'DetailType': 'ItemBasedExpenseLineDetail',
-    //     'Description': 'Item PO:12345 - office supplies',
-    //     'PaymentType': 'CreditCard',
-    //     'AccountRef': {
-    //       'value': '41',
-    //       'name': 'Mastercard'
-    //     },
-    //     // 'CurrencyRef': { // required if multi-currency is enabled
-    //     //   'value': 'USD',
-    //     //   'name': 'United States Dollar'
-    //     // },
-    //     // 'TxnDate': '2025-10-17',
-    //     // 'TxnId': '12345',
-    //     // 'TxnType': 'Purchase',
-
-    //     'ItemBasedExpenseLineDetail': {
-    //       'ItemRef': {
-    //         'value': '1',
-    //         'name': 'Office Supplies'
-    //       },
-    //       // 'TaxCodeRef': {
-    //       //   'value': '2',
-    //       //   'name': 'TAX'
-    //       // },
-    //       // 'CustomerRef': {
-    //       //   'value': '1',
-    //       //   'name': 'John Doe'
-    //       // }
-    //       //}
-    //     }
-    //   }
-    // ]
   };
 
   var requestObj = {
